@@ -1,0 +1,5 @@
+InquirerPy
+colorama
+requests
+plyer
+bs4

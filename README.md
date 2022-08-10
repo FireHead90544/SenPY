@@ -7,7 +7,7 @@
   />
   <h3>SenPY</h3>
   <p>
-    An highly efficient anime downloader written in Python, integrated with Aria2.
+    A highly efficient anime downloader written in Python, integrated with Aria2.
   </p>
   <a href="https://github.com/FireHead90544/SenPY/releases"> <strong>· Download Executable Release ·</strong></a>
 </div>

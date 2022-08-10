@@ -158,7 +158,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     """
     start = time.perf_counter()
     download_dir = client.config.downloads_dir / anime_dir
-    cmd = f"aria2c -s 16 -x 16 -j 16 --max-concurrent-downloads=6 -d \"{download_dir}\" -Z " + "\"" + "\" \"".join(links) + "\""
+    cmd = f"{client.config.aria_2_path} -s 16 -x 16 -j 16 --max-concurrent-downloads=6 -d \"{download_dir}\" -Z " + "\"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         print(line.decode('utf-8', errors='ignore').rstrip())
@@ -166,10 +166,16 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     total_time = f"{round(time.perf_counter() - start, 2)}s"
     client.config.logger.info(f"Downloaded {len(links)} episodes to \"{download_dir.resolve()}\" in {total_time}")
     print(f"{Fore.GREEN}>>> Download Completed in {total_time} {Fore.WHITE}| Downloaded {Fore.GREEN}{len(links)} episodes{Fore.WHITE} to {Fore.RED}\"{download_dir.resolve()}\" {Fore.GREEN}<<<")
+    # Some pyinstaller config for --onefile option
     try:
-        notification.notify(title="SenPY | Download Completed", message=f"Downloaded {len(links)} episode(s) to \"{str(download_dir.resolve())}\" in {total_time}", app_icon=str(Path("icon.ico").resolve()), timeout=10)
+        base_path = Path(sys._MEIPASS)
     except Exception:
-        pass # silently ignore if unable to show notification
+        base_path = Path(".")
+    app_icon = base_path / "icon.ico"
+    try:
+        notification.notify(title="SenPY | Download Completed", message=f"Downloaded {len(links)} episode(s) to \"{str(download_dir.resolve())}\" in {total_time}", app_icon=str(app_icon.resolve()), timeout=10)
+    except Exception as e:
+        client.config.logger.error(f"Unable to send notification | Error: {e}") # silently ignore if unable to show notification
     client.utils.sleep(10)
     home()
 

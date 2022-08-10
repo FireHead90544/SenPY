@@ -8,6 +8,7 @@ __pycache__/
 
 # Project specific files
 config.json
+*.exe
 
 # Distribution / packaging
 .Python

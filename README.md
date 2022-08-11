@@ -56,11 +56,11 @@ Now, open the `dist` folder and get your executable from there.
 
 1. Extract the `aria2`'s folder you just downloaded. Copy the path to it's executable (In windows, the executable has an extension '.exe'), (Linux users can run `which aria2c` and copy that path)
 2. Run the SenPY's application for the first time and close it, it will create a config file at `$HOME/.senpy/config.json` (You can edit it manually if want to or just move onto next step)
-3. Run the SenPY's application again and select the `Update Config File` option, add your gogoanime-registered email and password (you can use the below credentials too, but it's better to use your own since these ones can be invalidated probably). In the `aria2's executable path input`, enter the path to aria2's executable you just copied and in the `downloads folder input`, enter the path to the folder (make sure to create one already) where you want your animes to be downloaded.
+3. Run the SenPY's application again and select the `Update Config File` option, update your gogoanime-registered email and password (you can use the below credentials too, but it's better to use your own since these ones can be invalidated probably). In the `aria2's executable path input`, enter the path to aria2's executable you just copied and in the `downloads folder input`, enter the path to the folder (make sure to create one already) where you want your animes to be downloaded.
 
 **Config File Location** (Not meant for general public): `$HOME/.senpy/config.json` (Global Location), `Project Root/config.json` (Local Location). Local Location takes priority over Global Location.
 
-**Dummy Credentials**
+**Dummy Credentials**: (Please don't be a retarded kid and do not change the password or anything, just use your own credentials instead)
 | Name | Value |
 |:--:|:--:|
 | EMAIL | wihay47579@aregods.com |

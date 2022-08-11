@@ -59,8 +59,8 @@ class GogoConfig():
                 global_config.parent.mkdir(parents=True, exist_ok=True)
                 global_config.touch()
                 with open(global_config, "w") as f:
-                    json.dump({"EMAIL": "ENTER YOUR GOGOANIME REGISTERED EMAIL HERE",
-                    "PASSWORD": "ENTER YOUR GOGOANIME REGISTERED PASSWORD HERE",
+                    json.dump({"EMAIL": "wihay47579@aregods.com",
+                    "PASSWORD": "NeverGonnaGiveYouUp",
                     "DOWNLOADS_DIR": "ENTER DOWNLOAD LOCATION (Windows: Drive:\Folder, Linux: /path/to/folder)",
                     "ARIA_2_PATH": "ENTER THE PATH TO ARIA2's EXECUTABLE"}, f, indent=2, sort_keys=True)
                     self.logger.warning("Update your config file by adding your credentials and updating download location before using the application.")

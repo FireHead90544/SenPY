@@ -158,12 +158,14 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     """
     start = time.perf_counter()
     download_dir = client.config.downloads_dir / anime_dir
-    cmd = f"'{client.config.aria_2_path}' -s 16 -x 16 -j 16 --max-concurrent-downloads=6 -d \"{download_dir}\" -Z " + "\"" + "\" \"".join(links) + "\""
+    cmd = [str(client.config.aria_2_path.resolve()), "-s", '16', "-x", '16', "-j", '16', "--max-concurrent-downloads=6", "-d", str(download_dir.resolve()), "-Z"]
+    cmd = subprocess.list2cmdline(cmd)
+    cmd += " \"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         print(line.decode('utf-8', errors='ignore').rstrip())
     p.wait()
-    total_time = f"{round(time.perf_counter() - start, 2)}s"
+    total_time = client.utils.convert_seconds_to_time(round(time.perf_counter() - start))
     client.config.logger.info(f"Downloaded {len(links)} episodes to \"{download_dir.resolve()}\" in {total_time}")
     print(f"{Fore.GREEN}>>> Download Completed in {total_time} {Fore.WHITE}| Downloaded {Fore.GREEN}{len(links)} episodes{Fore.WHITE} to {Fore.RED}\"{download_dir.resolve()}\" {Fore.GREEN}<<<")
     # Some pyinstaller config for --onefile option
@@ -281,7 +283,7 @@ def download_anime() -> None:
     print(f"\n>>> {Fore.GREEN}Fetched Download Links. Starting Download in 10 seconds. Please do not close the window.")
     print(f"\n>>> {Fore.RED}If you are an experienced aria2 user, download links have also been logged in the log file, you can do stuffs with them later.")
     print(f"\n>>> {Fore.GREEN}Downloads a maximum of 6 episodes at a time to maximize speed and downloads.")
-    client.utils.sleep(10)
+    client.utils.sleep(6)
     header()
     download_using_aria2(download_links, anime_dir) # The actual downloading here
 

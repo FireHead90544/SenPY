@@ -59,3 +59,25 @@ class GogoUtils:
             seconds (int): The number of seconds to sleep for.
         """
         time.sleep(seconds)
+
+    def convert_seconds_to_time(self, rawseconds: int) -> str:
+        """
+        Converts seconds to human readable representation.
+
+        Args:
+            rawseconds (int): The number of seconds to convert.
+        
+        Returns:
+            str: The human readable representation of the time.
+        """
+        days = rawseconds // 86400
+        hours = (rawseconds - days * 86400) // 3600
+        minutes = (rawseconds - days * 86400 - hours * 3600) // 60
+        seconds = rawseconds - days * 86400 - hours * 3600 - minutes * 60
+
+        time = (("{0} day{1}, ".format(days, "s" if days != 1 else "") if days else "") + \
+        ("{0} hour{1}, ".format(hours, "s" if hours != 1 else "") if hours else "") + \
+        ("{0} minute{1}, ".format(minutes, "s" if minutes != 1 else "") if minutes else "") + \
+        ("{0} second{1}, ".format(seconds, "s" if seconds != 1 else "") if seconds else ""))[0:-2]
+
+        return time

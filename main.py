@@ -158,7 +158,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     """
     start = time.perf_counter()
     download_dir = client.config.downloads_dir / anime_dir
-    cmd = f"{client.config.aria_2_path} -s 16 -x 16 -j 16 --max-concurrent-downloads=6 -d \"{download_dir}\" -Z " + "\"" + "\" \"".join(links) + "\""
+    cmd = f"'{client.config.aria_2_path}' -s 16 -x 16 -j 16 --max-concurrent-downloads=6 -d \"{download_dir}\" -Z " + "\"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         print(line.decode('utf-8', errors='ignore').rstrip())

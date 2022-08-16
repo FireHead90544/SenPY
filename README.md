@@ -43,7 +43,7 @@ The installation is pretty easy.
 **[Non-Techy users need not to think about this]** If you don't want to download the release and want to build the application on your own (Linux/Mac users needs to this for the time being as well). You need to download python on your system first, clone the repository, switch to the project's root directory, install the requirements present in the `requirements.txt` and run the below command from the project root directory.
 <details>
   <summary>Read this if you are somewhat experienced with pyinstaller</summary>
-   If you know what you are doing, you can replace <b>--onefile</b> flag with <b>--onedir</b> since it is preferred over <b>--onefile</b> becase <b>--onefile</b> generated applications unpacks everything in a temp directory everytime when run.
+   If you know what you are doing, you can replace <b>--onefile</b> flag with <b>--onedir</b> since it is preferred over <b>--onefile</b> becase <b>--onefile</b> generated applications unpacks everything in a temp directory everytime when run. And linux/mac/android users can replace the "win" in --hidden-import with their os alternative in the below build command as "linux", "macosx", and "android" respectively.
 </details>
 
 ```console

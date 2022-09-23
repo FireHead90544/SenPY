@@ -161,11 +161,12 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     cmd = [str(client.config.aria_2_path.resolve()), "-s", '16', "-x", '16', "-j", '16', "--max-concurrent-downloads=6", "-d", str(download_dir.resolve()), "-Z"]
     cmd = subprocess.list2cmdline(cmd)
     cmd += " \"" + "\" \"".join(links) + "\""
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd, shell=True, bufsize=1, universal_newlines=True, stdout=subprocess.PIPE)
     for line in p.stdout:
-        print(line.decode('utf-8', errors='ignore').rstrip())
+        print(line.rstrip(), end="\r")
     p.wait()
     total_time = client.utils.convert_seconds_to_time(round(time.perf_counter() - start))
+    header()
     client.config.logger.info(f"Downloaded {len(links)} episodes to \"{download_dir.resolve()}\" in {total_time}")
     print(f"{Fore.GREEN}>>> Download Completed in {total_time} {Fore.WHITE}| Downloaded {Fore.GREEN}{len(links)} episodes{Fore.WHITE} to {Fore.RED}\"{download_dir.resolve()}\" {Fore.GREEN}<<<")
     # Some pyinstaller config for --onefile option

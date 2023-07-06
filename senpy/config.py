@@ -6,7 +6,7 @@ from pathlib import Path
 import logging
 import time
 
-class GogoConfig():
+class GogoConfig:
     """A configuration class for GoGoAnime, 
     which will be used to login and get the required cookies for downloads,
     the csrf token and the current gogoanime url, and
@@ -64,14 +64,12 @@ class GogoConfig():
                     "DOWNLOADS_DIR": "ENTER DOWNLOAD LOCATION (Windows: Drive:\Folder, Linux: /path/to/folder)",
                     "ARIA_2_PATH": "ENTER THE PATH TO ARIA2's EXECUTABLE"}, f, indent=2, sort_keys=True)
                     self.logger.warning("Update your config file by adding your credentials and updating download location before using the application.")
-                self.config_path = global_config
-            else:
-                self.config_path = global_config
+            self.config_path = global_config
         else:
             self.config_path = local_config
 
         self.logger.info(f"({round(time.perf_counter() - start, 2)}s) Config file found at \"{self.config_path.resolve()}\"")
-        
+
         return self.config_path
 
     def get_cookies(self) -> dict:
@@ -81,18 +79,21 @@ class GogoConfig():
             cookies (dict): The cookies for the session.
         """
         start = time.perf_counter()
-        self.session.post(self.CURRENT_URL + "/login.html", data={
-            "email": self.email,
-            "password": self.password,
-            "_csrf": self.get_csrf_token()
-        })
+        self.session.post(
+            f"{self.CURRENT_URL}/login.html",
+            data={
+                "email": self.email,
+                "password": self.password,
+                "_csrf": self.get_csrf_token(),
+            },
+        )
         self.cookies["gogoanime"] = self.session.cookies.get("gogoanime")
         self.cookies["auth"] = self.session.cookies.get("auth")
 
         if not self.cookies["auth"]:
             self.logger.critical("Invalid credentials. Please check your credentials.")
             raise InvalidCredentialsError(f"Invalid Credentials Provided, Please Correct Them !!! Config File at \"{self.config_path.resolve()}\"")
-        
+
         self.logger.info(f"({round(time.perf_counter() - start, 2)}s) Successfully fetched cookies for the session.")
         return self.cookies
 
@@ -103,7 +104,7 @@ class GogoConfig():
         Returns:
             current_url (str): The URL of the current gogoanime domain.
         """
-        self.CURRENT_URL = self.session.get(self.MAIN_URL).url[0:-1]
+        self.CURRENT_URL = self.session.get(self.MAIN_URL).url[:-1]
         return self.CURRENT_URL
 
     def get_csrf_token(self) -> str:
@@ -113,4 +114,7 @@ class GogoConfig():
         Returns:
             csrf_token (str): The CSRF token for login.
         """
-        return BeautifulSoup(self.session.get(self.CURRENT_URL + "/login.html").content, "html.parser").select("meta[name='csrf-token']")[0]["content"]
+        return BeautifulSoup(
+            self.session.get(f"{self.CURRENT_URL}/login.html").content,
+            "html.parser",
+        ).select("meta[name='csrf-token']")[0]["content"]

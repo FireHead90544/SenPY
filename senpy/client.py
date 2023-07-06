@@ -1,3 +1,4 @@
+import contextlib
 from .config import GogoConfig
 from .utils import GogoUtils
 from bs4 import BeautifulSoup
@@ -11,6 +12,7 @@ class GogoClient:
     about doing stuffs manually.
     """
     def __init__(self) -> None:
+        self.logger = None
         self.config = GogoConfig()
         self.utils = GogoUtils()
         self.session = self.config.session
@@ -53,11 +55,11 @@ class GogoClient:
         """
         start = time.perf_counter()
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/category/{animeid}").content, 'html.parser')
-        first = int([i for i in soup.select("#episode_page")[0]][1].a['ep_start'])
-        last = int([i for i in soup.select("#episode_page")[0]][-2].a['ep_end'])
+        first = int(list(soup.select("#episode_page")[0])[1].a['ep_start'])
+        last = int(list(soup.select("#episode_page")[0])[-2].a['ep_end'])
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/{animeid}-episode-{first}").content, 'html.parser')
         all_eps = []
-        try:
+        with contextlib.suppress(Exception):
             if soup.select("#wrapper_bg > section > section.content_left > div > h1")[0].getText().strip() == "Error 404": # Checking if episode-0 exists
                 soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/{animeid}").content, 'html.parser')
                 try:
@@ -66,10 +68,7 @@ class GogoClient:
                 except Exception:
                     all_eps.append("")
                     first += 1
-        except Exception:
-            pass
-
-        all_eps.extend([i for i in range(first, last + 1)])
+        all_eps.extend(list(range(first, last + 1)))
 
         self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched all episodes (excluding bonus episodes) for anime id: \"{animeid}\"")
         return all_eps

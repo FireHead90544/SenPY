@@ -16,17 +16,17 @@ class GogoUtils:
             ep_num list[Union[int, float]]: The list containg the parsed and sorted episode numbers. (e.g, [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 15, 16, 17, 18, 18.5 19, 19.5, 20])
         """
         final = []
-        temp = [i for i in ep_str.split(",")]
+        temp = list(ep_str.split(","))
         for i in temp:
             if "-" in i: # Handles episode in between ranges (list(int))
-                lower, upper = [j for j in i.split("-")]
+                lower, upper = list(i.split("-"))
                 final.extend(range(int(lower), int(upper)+1))
             else: # Handles, extra/bonus episodes (floats) and normal episodes (ints)
                 try:
                     final.append(int(i))
                 except ValueError:
                     final.append(float(i))
-        
+
         return sorted(list(set(final)))
 
     def fix_episode_download_names(self, ep_list: list) -> list:
@@ -75,9 +75,21 @@ class GogoUtils:
         minutes = (rawseconds - days * 86400 - hours * 3600) // 60
         seconds = rawseconds - days * 86400 - hours * 3600 - minutes * 60
 
-        time = (("{0} day{1}, ".format(days, "s" if days != 1 else "") if days else "") + \
-        ("{0} hour{1}, ".format(hours, "s" if hours != 1 else "") if hours else "") + \
-        ("{0} minute{1}, ".format(minutes, "s" if minutes != 1 else "") if minutes else "") + \
-        ("{0} second{1}, ".format(seconds, "s" if seconds != 1 else "") if seconds else ""))[0:-2]
-
-        return time
+        return (
+            ("{0} day{1}, ".format(days, "s" if days != 1 else "") if days else "")
+            + (
+                "{0} hour{1}, ".format(hours, "s" if hours != 1 else "")
+                if hours
+                else ""
+            )
+            + (
+                "{0} minute{1}, ".format(minutes, "s" if minutes != 1 else "")
+                if minutes
+                else ""
+            )
+            + (
+                "{0} second{1}, ".format(seconds, "s" if seconds != 1 else "")
+                if seconds
+                else ""
+            )[:-2]
+        )

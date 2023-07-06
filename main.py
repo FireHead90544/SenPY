@@ -2,7 +2,7 @@ from senpy import GogoClient
 from InquirerPy import prompt # pip install InquirerPy
 from InquirerPy.base.control import Choice
 from InquirerPy.validator import PathValidator
-from colorama import init, Fore, init # pip install colorama
+from colorama import Fore, init # pip install colorama
 from senpy import __version__
 from plyer import notification # pip install plyer
 from pathlib import Path
@@ -102,13 +102,13 @@ def update_configs() -> None:
         }
     ]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    new_conf = {
-        "EMAIL": results['user_email'],
-        "PASSWORD": results['user_password'],
-        "DOWNLOADS_DIR": results['downloads_dir'],
-        "ARIA_2_PATH": results['aria_2_path']
-    }
     if results['proceed']:
+        new_conf = {
+            "EMAIL": results['user_email'],
+            "PASSWORD": results['user_password'],
+            "DOWNLOADS_DIR": results['downloads_dir'],
+            "ARIA_2_PATH": results['aria_2_path']
+        }
         with open(client.config.config_path, "w") as f:
             json.dump(new_conf, f, indent=4, sort_keys=True)
         print(f"{Fore.GREEN}>>> Config file updated successfully. Please restart the application to apply changes.")
@@ -200,42 +200,51 @@ def search_anime_and_get_episode_pages_links() -> tuple:
     result = prompt(questions=questions, style=client.config.stylesheet)
     results = client.anime_search(result['anime_name'])
     header()
-    if len(results) == 0:
-        print(f"\n>>> {Fore.RED}No results found. {Fore.WHITE}Please try again with another query.")
-        client.utils.sleep(3)
-        search_anime_and_get_episode_pages_links()
-    else:
-        print(f"\n{Fore.GREEN}>>> {Fore.WHITE}Found {Fore.GREEN}{len(results)} {Fore.WHITE}results:")
-        questions = [
-            {
-                "type": "list",
-                "name": "anime_id",
-                "message": "Select the anime to download:",
-                "choices": [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in results]
-            }
-        ]
-        result = prompt(questions=questions, style=client.config.stylesheet)
-        anime_id = result['anime_id']
-        all_eps = client.get_all_episode_numbers(anime_id)
-        print("\n")
-        questions = [
-            {
-                "type": "list",
-                "name": "episodes",
-                "message": "Select the episode(s) to download:",
-                "choices": [Choice("all", name=f"All Episodes ({len(all_eps)}, Excluding Bonus Episodes)"), Choice("custom", name=f"Custom (Range, Numbers)")]
-            }
-        ]
-        result = prompt(questions=questions, style=client.config.stylesheet)
-        if result['episodes'] == "custom":
-            header()
-            print(f">>> {Fore.RED}IMPORTANT: {Fore.WHITE}Please make sure that the {Fore.GREEN}episode actually exists{Fore.WHITE}, else you will get {Fore.RED}errors {Fore.WHITE}later.")
-            eps = client.utils.string_to_sequence(prompt(questions=[{"type": "input", "message": "Enter the episode number/range to download [Can Include Bonus Episodes, e.g, 14.5] (e.g, 1-6, 6.5, 7, 10-12): ", "name": "episodes", "validate": lambda result: len(result) > 0, "invalid_message": "Input cannot be empty."}], style=client.config.stylesheet)['episodes'])
-        else:
-            eps = all_eps
+    if len(results) != 0:
+        return get_results(results)
+    print(f"\n>>> {Fore.RED}No results found. {Fore.WHITE}Please try again with another query.")
+    client.utils.sleep(3)
+    search_anime_and_get_episode_pages_links()
 
-        anime_dir = anime_id.replace("-", " ").title()
-        return client.get_episode_pages_links(anime_id, eps), anime_dir
+
+def get_results(results):
+    print(f"\n{Fore.GREEN}>>> {Fore.WHITE}Found {Fore.GREEN}{len(results)} {Fore.WHITE}results:")
+    questions = [
+        {
+            "type": "list",
+            "name": "anime_id",
+            "message": "Select the anime to download:",
+            "choices": [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in results]
+        }
+    ]
+    result = prompt(questions=questions, style=client.config.stylesheet)
+    anime_id = result['anime_id']
+    all_eps = client.get_all_episode_numbers(anime_id)
+    print("\n")
+    questions = [
+        {
+            "type": "list",
+            "name": "episodes",
+            "message": "Select the episode(s) to download:",
+            "choices": [
+                Choice(
+                    "all",
+                    name=f"All Episodes ({len(all_eps)}, Excluding Bonus Episodes)",
+                ),
+                Choice("custom", name="Custom (Range, Numbers)"),
+            ],
+        }
+    ]
+    result = prompt(questions=questions, style=client.config.stylesheet)
+    if result['episodes'] == "custom":
+        header()
+        print(f">>> {Fore.RED}IMPORTANT: {Fore.WHITE}Please make sure that the {Fore.GREEN}episode actually exists{Fore.WHITE}, else you will get {Fore.RED}errors {Fore.WHITE}later.")
+        eps = client.utils.string_to_sequence(prompt(questions=[{"type": "input", "message": "Enter the episode number/range to download [Can Include Bonus Episodes, e.g, 14.5] (e.g, 1-6, 6.5, 7, 10-12): ", "name": "episodes", "validate": lambda result: len(result) > 0, "invalid_message": "Input cannot be empty."}], style=client.config.stylesheet)['episodes'])
+    else:
+        eps = all_eps
+
+    anime_dir = anime_id.replace("-", " ").title()
+    return client.get_episode_pages_links(anime_id, eps), anime_dir
         
 
 def download_anime() -> None:
@@ -263,9 +272,6 @@ def download_anime() -> None:
     for ep_link in ep_pages_links:
         quality_links = client.get_episode_quality_download_links(ep_link)
         qualities = [int(q.replace("p", "")) for q in quality_links.keys()] # Get the raw integers of the qualities available for easy comparision
-        if quality_links == {}: # No links found, probably wrong episode number given, logged in the log file already
-            pass
-
         if f"{result['quality']}p" in quality_links.keys():
             download_links.append(quality_links[f"{result['quality']}p"])
         else:

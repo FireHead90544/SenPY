@@ -25,11 +25,10 @@ class GogoConfig:
         self.downloads_dir = Path(self.loaded_config['DOWNLOADS_DIR'])
         self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
         self.session = requests.Session()
-        self.MAIN_URL = "https://gogoanime.ar" # This hopefully won't ever change.
+        self.MAIN_URL = "https://gogoanime.vet" # This hopefully won't ever change.
         self.CURRENT_URL = ""
         self.get_current_url()
         self.cookies = {}
-        self.get_cookies()
         self.stylesheet = {"questionmark": "#16C60C bold", "answermark": "#e0af68", "answer": "#E5E512", "input": "#98c379", "question": "#E74856 bold", "answered_question": "", "instruction": "#a9b1d6", "long_instruction": "#a9b1d6", "pointer": "#3A96DD", "checkbox": "#9ece6a", "separator": "", "skipped": "#48444c", "validator": "", "marker": "#9ece6a", "fuzzy_prompt": "#bb9af7", "fuzzy_info": "#a9b1d6", "fuzzy_border": "#343740", "fuzzy_match": "#bb9af7", "spinner_pattern": "#9ece6a", "spinner_text": ""}
 
     def setup_logger(self) -> None:

@@ -1,4 +1,3 @@
-import contextlib
 from senpy import GogoClient
 from InquirerPy import prompt # pip install InquirerPy
 from InquirerPy.base.control import Choice
@@ -9,7 +8,6 @@ from plyer import notification # pip install plyer
 from pathlib import Path
 from io import StringIO
 import subprocess
-import json
 import time
 import sys
 import re
@@ -37,7 +35,7 @@ def header() -> None:
 {Fore.YELLOW} _____________________________________________________________
                                                                 
     """)
-results = {}
+
 
 def home():
     """
@@ -94,8 +92,8 @@ def update_email() -> None:
             "name": "user_email",
             "validate": lambda result: bool(re.match(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$", result)),
             "invalid_message": "Invalid email address."}]
-    update_email.results = prompt(questions=questions, style=client.config.stylesheet)
-    results['user_email'] = update_email.results['user_email']
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    client.config.results['user_email'] = results['user_email']
     update_configs()
 
 def update_pass():
@@ -104,14 +102,14 @@ def update_pass():
     questions = [
         {
          "type": "password",
-         "message": "Enter the password associated with above email:",
+         "message": "Enter the password associated with the email:",
          "name": "user_password",
          "transformer": lambda _: "[hidden]",
          "validate": lambda result: len(result) > 0,
          "invalid_message": "Input cannot be empty."
         }]
-    update_pass.results = prompt(questions=questions, style=client.config.stylesheet)
-    results['user_password'] = update_pass.results['user_password']
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    client.config.results['user_password'] = results['user_password']
     update_configs()
 
 
@@ -126,8 +124,8 @@ def update_download_directory():
          "name": "downloads_dir",
          "only_directories": True,
         }]
-    update_download_directory.results = prompt(questions=questions, style=client.config.stylesheet)
-    results['downloads_dir'] = update_download_directory.results['downloads_dir']
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    client.config.results['downloads_dir'] = results['downloads_dir']
     update_configs()
 
 
@@ -142,8 +140,8 @@ def update_aria_file_path():
          "validate": PathValidator(is_file=True, message="Input is not a file"),
          "only_files": True,
         }]
-    update_aria_file_path.results = prompt(questions=questions, style=client.config.stylesheet)
-    results['aria_2_path'] = update_aria_file_path.results['aria_2_path']
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    client.config.results['aria_2_path'] = results['aria_2_path']
     update_configs()
 
 
@@ -159,30 +157,10 @@ def write_file():
         }]
     write_file.results = prompt(questions=questions, style=client.config.stylesheet)
     if write_file.results['proceed']:
-        write_it_out()
-    else:
-        home()
-
-
-def write_it_out():
-    new_conf = {}
-    with open(client.config.config_path, "r") as f:
-        old_config = json.load(f)
-    with contextlib.suppress(Exception):
-        new_conf["EMAIL"] = results['user_email']
-    with contextlib.suppress(Exception):
-        new_conf["PASSWORD"] = results['user_password']
-    with contextlib.suppress(Exception):
-        new_conf["DOWNLOADS_DIR"] = results['downloads_dir']
-    with contextlib.suppress(Exception):
-        new_conf["ARIA_2_PATH"] = results['aria_2_path']
-    old_config.update(new_conf)
-
-    with open(client.config.config_path, "w") as f:
-        json.dump(old_config, f, indent=4, sort_keys=True)
-        print(f"{Fore.GREEN}>>> Config file updated successfully. Please restart the application to apply changes.")
+        client.config.write_config(client.config.results)
+        print(f"{Fore.GREEN}>>> Config file updated successfully.")
         client.utils.sleep(3)
-        sys.exit()
+    home()
 
 def do_pre_checks() -> None:
     """
@@ -274,14 +252,14 @@ def search_anime_and_get_episode_pages_links() -> tuple:
     search_anime_and_get_episode_pages_links()
 
 
-def get_results(results):
-    print(f"\n{Fore.GREEN}>>> {Fore.WHITE}Found {Fore.GREEN}{len(results)} {Fore.WHITE}results:")
+def get_results(arg0):
+    print(f"\n{Fore.GREEN}>>> {Fore.WHITE}Found {Fore.GREEN}{len(arg0)} {Fore.WHITE}results:")
     questions = [
         {
             "type": "list",
             "name": "anime_id",
             "message": "Select the anime to download:",
-            "choices": [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in results]
+            "choices": [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in arg0]
         }
     ]
     result = prompt(questions=questions, style=client.config.stylesheet)

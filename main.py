@@ -1,3 +1,4 @@
+import contextlib
 from senpy import GogoClient
 from InquirerPy import prompt # pip install InquirerPy
 from InquirerPy.base.control import Choice
@@ -253,17 +254,22 @@ def search_anime_and_get_episode_pages_links() -> tuple:
 
 
 def get_results(arg0):
+    header()
     print(f"\n{Fore.GREEN}>>> {Fore.WHITE}Found {Fore.GREEN}{len(arg0)} {Fore.WHITE}results:")
+    choices = [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in arg0]
+    choicesback = [Choice(search_anime_and_get_episode_pages_links, name="Back")]
     questions = [
-        {
+             {
             "type": "list",
             "name": "anime_id",
             "message": "Select the anime to download:",
-            "choices": [Choice(r['id'], name=f"{r['name']} [Released: {r['released']}]") for r in arg0]
+            "choices": choices + choicesback
         }
     ]
-    result = prompt(questions=questions, style=client.config.stylesheet)
-    anime_id = result['anime_id']
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    with contextlib.suppress(TypeError):
+        results['anime_id']()
+    anime_id = results['anime_id']
     all_eps = client.get_all_episode_numbers(anime_id)
     print("\n")
     questions = [
@@ -277,10 +283,13 @@ def get_results(arg0):
                     name=f"All Episodes ({len(all_eps)}, Excluding Bonus Episodes)",
                 ),
                 Choice("custom", name="Custom (Range, Numbers)"),
+                Choice(get_results, name="Back")
             ],
         }
     ]
     result = prompt(questions=questions, style=client.config.stylesheet)
+    with contextlib.suppress(Exception):
+        result['episodes'](arg0)
     if result['episodes'] == "custom":
         header()
         print(f">>> {Fore.RED}IMPORTANT: {Fore.WHITE}Please make sure that the {Fore.GREEN}episode actually exists{Fore.WHITE}, else you will get {Fore.RED}errors {Fore.WHITE}later.")
@@ -293,12 +302,12 @@ def get_results(arg0):
         
 
 def download_anime() -> None:
-    client.config.get_cookies()
     """
     Searches the anime, selects it and does some highly intellecual stuff
     and downloads the anime to your machine.
     In short, searches anime, fetches it's episodes and quality and downloads it.
     """
+    client.config.get_cookies() # get cookies and use login information
     do_pre_checks() # Makes sure everything's okay and program's ready to run.
     ep_pages_links, anime_dir = search_anime_and_get_episode_pages_links()
     header()

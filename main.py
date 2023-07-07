@@ -1,3 +1,4 @@
+import contextlib
 from senpy import GogoClient
 from InquirerPy import prompt # pip install InquirerPy
 from InquirerPy.base.control import Choice
@@ -36,7 +37,7 @@ def header() -> None:
 {Fore.YELLOW} _____________________________________________________________
                                                                 
     """)
-
+results = {}
 
 def home():
     """
@@ -58,64 +59,130 @@ def home():
     result = prompt(questions=questions, style=client.config.stylesheet)
     result['action']()
 
-def update_configs() -> None:
+
+def update_configs():
+    header()
+    questions = [
+        {
+            "type": "list",
+            "name": "action",
+            "message": "Select an action: ",
+            "choices": [
+                Choice(update_email, name="Enter Email Address"),
+                Choice(update_pass, name="Update Password"),
+                Choice(update_download_directory, name="Downloads Directory"),
+                Choice(update_aria_file_path, name="Aria2 Path"),
+                Choice(write_file, name="Write to File"),
+                Choice(home, name="Back")
+            ]
+        }
+    ]
+    answers = prompt(questions=questions, style=client.config.stylesheet)
+    answers['action']()
+
+
+def update_email() -> None:
     """
     Updates the config file and it's contents in a cool way, sheeeeeeeeesh :)
     """
     header()
-    print(f"{Fore.GREEN}>>> Update Config File...")
+    print(f"{Fore.GREEN}>>> Update Email...")
     questions = [
         {
             "type": "input",
             "message": "Enter your gogoanime-registered email:",
             "name": "user_email",
             "validate": lambda result: bool(re.match(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$", result)),
-            "invalid_message": "Invalid email address."
-        },
+            "invalid_message": "Invalid email address."}]
+    update_email.results = prompt(questions=questions, style=client.config.stylesheet)
+    results['user_email'] = update_email.results['user_email']
+    update_configs()
+
+def update_pass():
+    header()
+    print(f"{Fore.GREEN}>>> Update Password...")
+    questions = [
         {
-            "type": "password",
-            "message": "Enter the password associated with above email:",
-            "name": "user_password",
-            "transformer": lambda _: "[hidden]",
-            "validate": lambda result: len(result) > 0,
-            "invalid_message": "Input cannot be empty."
-        },
+         "type": "password",
+         "message": "Enter the password associated with above email:",
+         "name": "user_password",
+         "transformer": lambda _: "[hidden]",
+         "validate": lambda result: len(result) > 0,
+         "invalid_message": "Input cannot be empty."
+        }]
+    update_pass.results = prompt(questions=questions, style=client.config.stylesheet)
+    results['user_password'] = update_pass.results['user_password']
+    update_configs()
+
+
+def update_download_directory():
+    header()
+    print(f"{Fore.GREEN}>>> Update Download Directory...")
+    questions = [
         {
-            "type": "filepath",
-            "message": "Enter the path to the anime downloads directory:",
-            "validate": PathValidator(is_dir=True, message="Input is not a directory"),
-            "name": "downloads_dir",
-            "only_directories": True,
-        },
+         "type": "filepath",
+         "message": "Enter the path to the anime downloads directory:",
+         "validate": PathValidator(is_dir=True, message="Input is not a directory"),
+         "name": "downloads_dir",
+         "only_directories": True,
+        }]
+    update_download_directory.results = prompt(questions=questions, style=client.config.stylesheet)
+    results['downloads_dir'] = update_download_directory.results['downloads_dir']
+    update_configs()
+
+
+def update_aria_file_path():
+    header()
+    print(f"{Fore.GREEN}>>> Update Aria2 Filepath...")
+    questions = [
         {
-            "type": "filepath",
-            "message": "Enter the path to aria2's executable:",
-            "name": "aria_2_path",
-            "validate": PathValidator(is_file=True, message="Input is not a file"),
-            "only_files": True,
-        },
+         "type": "filepath",
+         "message": "Enter the path to aria2's executable:",
+         "name": "aria_2_path",
+         "validate": PathValidator(is_file=True, message="Input is not a file"),
+         "only_files": True,
+        }]
+    update_aria_file_path.results = prompt(questions=questions, style=client.config.stylesheet)
+    results['aria_2_path'] = update_aria_file_path.results['aria_2_path']
+    update_configs()
+
+
+def write_file():
+    header()
+    print(f"{Fore.GREEN}>>> Write to Config File?...")
+    questions = [
         {
-            "type": "confirm",
-            "name": "proceed",
-            "message": "Are you sure you want to update the config file?",
-            "default": True
-        }
-    ]
-    results = prompt(questions=questions, style=client.config.stylesheet)
-    if results['proceed']:
-        new_conf = {
-            "EMAIL": results['user_email'],
-            "PASSWORD": results['user_password'],
-            "DOWNLOADS_DIR": results['downloads_dir'],
-            "ARIA_2_PATH": results['aria_2_path']
-        }
-        with open(client.config.config_path, "w") as f:
-            json.dump(new_conf, f, indent=4, sort_keys=True)
+         "type": "confirm",
+         "name": "proceed",
+         "message": "Are you sure you want to update the config file?",
+         "default": True
+        }]
+    write_file.results = prompt(questions=questions, style=client.config.stylesheet)
+    if write_file.results['proceed']:
+        write_it_out()
+    else:
+        home()
+
+
+def write_it_out():
+    new_conf = {}
+    with open(client.config.config_path, "r") as f:
+        old_config = json.load(f)
+    with contextlib.suppress(Exception):
+        new_conf["EMAIL"] = results['user_email']
+    with contextlib.suppress(Exception):
+        new_conf["PASSWORD"] = results['user_password']
+    with contextlib.suppress(Exception):
+        new_conf["DOWNLOADS_DIR"] = results['downloads_dir']
+    with contextlib.suppress(Exception):
+        new_conf["ARIA_2_PATH"] = results['aria_2_path']
+    old_config.update(new_conf)
+
+    with open(client.config.config_path, "w") as f:
+        json.dump(old_config, f, indent=4, sort_keys=True)
         print(f"{Fore.GREEN}>>> Config file updated successfully. Please restart the application to apply changes.")
         client.utils.sleep(3)
         sys.exit()
-    else:
-        home()
 
 def do_pre_checks() -> None:
     """
@@ -248,6 +315,7 @@ def get_results(results):
         
 
 def download_anime() -> None:
+    client.config.get_cookies()
     """
     Searches the anime, selects it and does some highly intellecual stuff
     and downloads the anime to your machine.

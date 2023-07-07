@@ -84,16 +84,16 @@ def update_email() -> None:
     Updates the config file and it's contents in a cool way, sheeeeeeeeesh :)
     """
     header()
-    print(f"{Fore.GREEN}>>> Update Email...")
+    print(f"{Fore.GREEN}>>> Update Email... Current Email:" + f"{Fore.WHITE}" + client.config.loaded_config['EMAIL'])
     questions = [
         {
             "type": "input",
             "message": "Enter your gogoanime-registered email:",
-            "name": "user_email",
+            "name": 'EMAIL',
             "validate": lambda result: bool(re.match(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$", result)),
             "invalid_message": "Invalid email address."}]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['user_email'] = results['user_email']
+    client.config.results['EMAIL'] = results['EMAIL']
     update_configs()
 
 def update_pass():
@@ -103,19 +103,19 @@ def update_pass():
         {
          "type": "password",
          "message": "Enter the password associated with the email:",
-         "name": "user_password",
+         "name": "PASSWORD",
          "transformer": lambda _: "[hidden]",
          "validate": lambda result: len(result) > 0,
          "invalid_message": "Input cannot be empty."
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['user_password'] = results['user_password']
+    client.config.results['PASSWORD'] = results['PASSWORD']
     update_configs()
 
 
 def update_download_directory():
     header()
-    print(f"{Fore.GREEN}>>> Update Download Directory...")
+    print(f"{Fore.GREEN}>>> Update Download Directory... Current path:"  + f"{Fore.WHITE}" + client.config.loaded_config['DOWNLOADS_DIR'])
     questions = [
         {
          "type": "filepath",
@@ -125,13 +125,13 @@ def update_download_directory():
          "only_directories": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['downloads_dir'] = results['downloads_dir']
+    client.config.results['DOWNLOADS_DIR'] = results['DOWNLOADS_DIR']
     update_configs()
 
 
 def update_aria_file_path():
     header()
-    print(f"{Fore.GREEN}>>> Update Aria2 Filepath...")
+    print(f"{Fore.GREEN}>>> Update Aria2 Filepath... Current path:"  + f"{Fore.WHITE}" + client.config.loaded_config['ARIA_2_PATH'])
     questions = [
         {
          "type": "filepath",
@@ -141,7 +141,7 @@ def update_aria_file_path():
          "only_files": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['aria_2_path'] = results['aria_2_path']
+    client.config.results['ARIA_2_PATH'] = results['ARIA_2_PATH']
     update_configs()
 
 

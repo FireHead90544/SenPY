@@ -25,7 +25,7 @@ class GogoConfig:
         self.downloads_dir = Path(self.loaded_config['DOWNLOADS_DIR'])
         self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
         self.session = requests.Session()
-        self.MAIN_URL = "https://gogoanime.vet" # This hopefully won't ever change.
+        self.MAIN_URL = "https://anitaku.to" # This hopefully won't ever change.
         self.CURRENT_URL = ""
         self.get_current_url()
         self.cookies = {}

@@ -18,6 +18,11 @@
 **SenPY** is a python script that allows you to download animes in your preferred quality. It allows you to download all episodes of an anime as a whole or any specific episode or episode range. It scrapes [gogoanime](https://gogoanime.pe/) and fetches the anime data from there. SenPY uses [aria2](https://github.com/aria2/aria2) as an external downloader which boosts up the download speed drastically and comes with several other epic features. It also allows you to customize your "Anime Downloads" folder and downloads animes to that particular folder only.
 <hr>
 
+## Quick Update
+
+So I just got free from my other stuffs and finally decided to work on this back. So you might see some considerable changes and several commits here and there, i.e, there might be some breaking changes. To add with, I am planning a rewrite of major portion of logic to some extent. Would be optimizing it greatly, so at some point this might stop working (which it still is not working either). You are advised to wait until the finalized builds are released.
+<hr>
+
 ## Index of Contents
 - [About](#about-senpy)
 - [Installation](#installation)

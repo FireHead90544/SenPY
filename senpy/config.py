@@ -131,4 +131,13 @@ class GogoConfig:
         self.loaded_config.update(new)
         with open(self.config_path, "w") as f:
             json.dump(self.loaded_config, f, indent=4, sort_keys=True)
+        self.refresh_config()
 
+    def refresh_config(self) -> None:
+        """Refreshes the config variables from the loaded config.
+        """
+        self.email = self.loaded_config['EMAIL']
+        self.password = self.loaded_config['PASSWORD']
+        self.downloads_dir = Path(self.loaded_config['DOWNLOADS_DIR'])
+        self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
+        self.max_concurrent_downloads = int(self.loaded_config['MAX_CONCURRENT_DOWNLOADS'])

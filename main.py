@@ -71,6 +71,7 @@ def update_configs():
                 Choice(update_pass, name="Update Password"),
                 Choice(update_download_directory, name="Downloads Directory"),
                 Choice(update_aria_file_path, name="Aria2 Path"),
+                Choice(update_max_concurrent_downloads, name="Max Concurrent Downloads"),
                 Choice(write_file, name="Write to File"),
                 Choice(home, name="Back")
             ]
@@ -126,7 +127,7 @@ def update_download_directory():
          "only_directories": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.config_updates['DOWNLOADS_DIR'] = results['DOWNLOADS_DIR']
+    client.config.config_updates['DOWNLOADS_DIR'] = results['downloads_dir']
     update_configs()
 
 
@@ -142,7 +143,26 @@ def update_aria_file_path():
          "only_files": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.config_updates['ARIA_2_PATH'] = results['ARIA_2_PATH']
+    client.config.config_updates['ARIA_2_PATH'] = results['aria_2_path']
+    update_configs()
+
+
+def update_max_concurrent_downloads():
+    header()
+    print(f"{Fore.GREEN}>>> Update Max Concurrent Downloads... Currently: {Fore.WHITE}{client.config.loaded_config['MAX_CONCURRENT_DOWNLOADS']}")
+    questions = [
+        {
+         "type": "number",
+         "message": "Enter the max concurrent downloads allowed:",
+         "name": "max_concurrent_downloads",
+         "min_allowed": 1,
+         "default": client.config.max_concurrent_downloads,
+         "max_allowed": 16, # Choose higher on your on risk man :skull:
+         "validate": lambda result: result.isdigit(),
+         "invalid_message": "Input must be an integer and cannot be empty."
+        }]
+    results = prompt(questions=questions, style=client.config.stylesheet)
+    client.config.config_updates['MAX_CONCURRENT_DOWNLOADS'] = results['max_concurrent_downloads']
     update_configs()
 
 
@@ -205,7 +225,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     """
     start = time.perf_counter()
     download_dir = client.config.downloads_dir / anime_dir
-    cmd = [str(client.config.aria_2_path.resolve()), "-s", '16', "-x", '16', "-j", '16', "--max-concurrent-downloads=6", "-d", str(download_dir.resolve()), "-Z"]
+    cmd = [str(client.config.aria_2_path.resolve()), "-s", '16', "-x", '16', "-j", '16', f"--max-concurrent-downloads={client.config.max_concurrent_downloads}", "-d", str(download_dir.resolve()), "-Z"]
     cmd = subprocess.list2cmdline(cmd)
     cmd += " \"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=True, bufsize=1, universal_newlines=True, stdout=subprocess.PIPE)
@@ -281,7 +301,7 @@ def get_results(arg0):
             "choices": [
                 Choice(
                     "all",
-                    name=f"All Episodes ({len(all_eps)}, Excluding Bonus Episodes)",
+                    name=f"All Episodes ({len(all_eps)})",
                 ),
                 Choice("custom", name="Custom (Range, Numbers)"),
                 Choice(get_results, name="Back")
@@ -343,9 +363,9 @@ def download_anime() -> None:
 
     client.config.logger.info("Logging the download links for aria2 experiments or other purposes if required.")
     client.config.logger.info(download_links)
-    print(f"\n>>> {Fore.GREEN}Fetched Download Links. Starting Download in 10 seconds. Please do not close the window.")
+    print(f"\n>>> {Fore.GREEN}Fetched Download Links. Starting Download in a few seconds. Please do not close the window.")
     print(f"\n>>> {Fore.RED}If you are an experienced aria2 user, download links have also been logged in the log file, you can do stuffs with them later.")
-    print(f"\n>>> {Fore.GREEN}Downloads a maximum of 6 episodes at a time to maximize speed and downloads.")
+    print(f"\n>>> {Fore.GREEN}You can change the number of max concurrent downloads in config file.")
     client.utils.sleep(6)
     header()
     download_using_aria2(download_links, anime_dir) # The actual downloading here

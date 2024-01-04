@@ -43,7 +43,7 @@ class GogoUtils:
         named_downloads = []
         for link in ep_list:
             prefix, name = link.split("&title=")
-            name = f"EP.{name.split('-episode-')[1]}"
+            name = f"EP.{name.split('-episode-')[1].replace('-', '.')}"
             named_downloads.append(f"{prefix}&title={name}")
         
         return named_downloads

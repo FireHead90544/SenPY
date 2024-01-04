@@ -60,7 +60,7 @@ class GogoClient:
         soup = BeautifulSoup(self.session.get(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
         all_eps = [eval(ep['href'].strip().split("-episode-")[1].replace("-", ".")) for ep in soup.select("ul#episode_related > li > a")]
 
-        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched all episodes (excluding bonus episodes) for anime id: \"{animeid}\"")
+        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched all episodes for anime id: \"{animeid}\"")
         return all_eps
 
     def get_episode_pages_links(self, animeid: str, eps: list) -> list:

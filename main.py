@@ -85,7 +85,7 @@ def update_email() -> None:
     Updates the config file and it's contents in a cool way, sheeeeeeeeesh :)
     """
     header()
-    print(f"{Fore.GREEN}>>> Update Email... Current Email:" + f"{Fore.WHITE}" + client.config.loaded_config['EMAIL'])
+    print(f"{Fore.GREEN}>>> Update Email... Current Email: {Fore.WHITE}{client.config.loaded_config['EMAIL']}")
     questions = [
         {
             "type": "input",
@@ -94,7 +94,7 @@ def update_email() -> None:
             "validate": lambda result: bool(re.match(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$", result)),
             "invalid_message": "Invalid email address."}]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['EMAIL'] = results['EMAIL']
+    client.config.config_updates['EMAIL'] = results['EMAIL']
     update_configs()
 
 def update_pass():
@@ -110,13 +110,13 @@ def update_pass():
          "invalid_message": "Input cannot be empty."
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['PASSWORD'] = results['PASSWORD']
+    client.config.config_updates['PASSWORD'] = results['PASSWORD']
     update_configs()
 
 
 def update_download_directory():
     header()
-    print(f"{Fore.GREEN}>>> Update Download Directory... Current path:"  + f"{Fore.WHITE}" + client.config.loaded_config['DOWNLOADS_DIR'])
+    print(f"{Fore.GREEN}>>> Update Download Directory... Current path: {Fore.WHITE}{client.config.loaded_config['DOWNLOADS_DIR']}")
     questions = [
         {
          "type": "filepath",
@@ -126,13 +126,13 @@ def update_download_directory():
          "only_directories": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['DOWNLOADS_DIR'] = results['DOWNLOADS_DIR']
+    client.config.config_updates['DOWNLOADS_DIR'] = results['DOWNLOADS_DIR']
     update_configs()
 
 
 def update_aria_file_path():
     header()
-    print(f"{Fore.GREEN}>>> Update Aria2 Filepath... Current path:"  + f"{Fore.WHITE}" + client.config.loaded_config['ARIA_2_PATH'])
+    print(f"{Fore.GREEN}>>> Update Aria2 Binary Path... Current path: {Fore.WHITE}{client.config.loaded_config['ARIA_2_PATH']}")
     questions = [
         {
          "type": "filepath",
@@ -142,7 +142,7 @@ def update_aria_file_path():
          "only_files": True,
         }]
     results = prompt(questions=questions, style=client.config.stylesheet)
-    client.config.results['ARIA_2_PATH'] = results['ARIA_2_PATH']
+    client.config.config_updates['ARIA_2_PATH'] = results['ARIA_2_PATH']
     update_configs()
 
 
@@ -158,7 +158,8 @@ def write_file():
         }]
     write_file.results = prompt(questions=questions, style=client.config.stylesheet)
     if write_file.results['proceed']:
-        client.config.write_config(client.config.results)
+        client.config.write_config(client.config.config_updates)
+        client.config.config_updates = {}
         print(f"{Fore.GREEN}>>> Config file updated successfully.")
         client.utils.sleep(3)
     home()

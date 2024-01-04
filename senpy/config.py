@@ -30,7 +30,7 @@ class GogoConfig:
         self.CURRENT_URL = ""
         self.get_current_url()
         self.cookies = {}
-        self.results = {}
+        self.config_updates = {}
         self.stylesheet = {"questionmark": "#16C60C bold", "answermark": "#e0af68", "answer": "#E5E512", "input": "#98c379", "question": "#E74856 bold", "answered_question": "", "instruction": "#a9b1d6", "long_instruction": "#a9b1d6", "pointer": "#3A96DD", "checkbox": "#9ece6a", "separator": "", "skipped": "#48444c", "validator": "", "marker": "#9ece6a", "fuzzy_prompt": "#bb9af7", "fuzzy_info": "#a9b1d6", "fuzzy_border": "#343740", "fuzzy_match": "#bb9af7", "spinner_pattern": "#9ece6a", "spinner_text": ""}
 
     def setup_logger(self) -> None:
@@ -121,7 +121,13 @@ class GogoConfig:
             "html.parser",
         ).select("meta[name='csrf-token']")[0]["content"]
 
-    def write_config(self, new):
+    def write_config(self, new: dict) -> None:
+        """Updates the config file with the new configuration.
+        Also updates the current loaded configuration.
+
+        Args:
+            new (dict): The configuration changes to be updated.
+        """
         self.loaded_config.update(new)
         with open(self.config_path, "w") as f:
             json.dump(self.loaded_config, f, indent=4, sort_keys=True)

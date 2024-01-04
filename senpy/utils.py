@@ -30,12 +30,12 @@ class GogoUtils:
         return sorted(list(set(final)))
 
     def fix_episode_download_names(self, ep_list: list) -> list:
-        """The downloaded episodes with the original link would have crappy shizzy named
+        """The downloaded episodes with the original link would have crappy shizzy names
         This changes the name of the downloaded episode before actually downloading it
-        directly in the link, so that after downloads a proper naming convention is followed.
+        directly in the link, so that after download a proper naming convention is followed.
 
         Args:
-            ep_list (list): The final list containg links to episodes.
+            ep_list (list): The final list containing links to episodes.
 
         Returns:
             named_downloads (list): A list to download episodes but with proper names.

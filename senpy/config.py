@@ -1,4 +1,4 @@
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
 from .errors import InvalidCredentialsError
 import json
@@ -24,7 +24,8 @@ class GogoConfig:
         self.password = self.loaded_config['PASSWORD']
         self.downloads_dir = Path(self.loaded_config['DOWNLOADS_DIR'])
         self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
-        self.session = requests.Session()
+        self.max_concurrent_downloads = int(self.loaded_config['MAX_CONCURRENT_DOWNLOADS'])
+        self.session = Session()
         self.MAIN_URL = "https://anitaku.to" # This hopefully won't ever change.
         self.CURRENT_URL = ""
         self.get_current_url()
@@ -62,8 +63,9 @@ class GogoConfig:
                     json.dump({"EMAIL": "wihay47579@aregods.com",
                     "PASSWORD": "NeverGonnaGiveYouUp",
                     "DOWNLOADS_DIR": "ENTER DOWNLOAD LOCATION (Windows: Drive:\Folder, Linux: /path/to/folder)",
-                    "ARIA_2_PATH": "ENTER THE PATH TO ARIA2's EXECUTABLE"}, f, indent=2, sort_keys=True)
-                    self.logger.warning("Update your config file by adding your credentials and updating download location before using the application.")
+                    "ARIA_2_PATH": "ENTER THE PATH TO ARIA2's EXECUTABLE",
+                    "MAX_CONCURRENT_DOWNLOADS": 6}, f, indent=2, sort_keys=True)
+                    self.logger.warning("Make sure to update your config file before trying to download anything.")
             self.config_path = global_config
         else:
             self.config_path = local_config
@@ -119,8 +121,8 @@ class GogoConfig:
             "html.parser",
         ).select("meta[name='csrf-token']")[0]["content"]
 
-    def write_config(self, arg0):
-        self.loaded_config.update(arg0)
+    def write_config(self, new):
+        self.loaded_config.update(new)
         with open(self.config_path, "w") as f:
             json.dump(self.loaded_config, f, indent=4, sort_keys=True)
 

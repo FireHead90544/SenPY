@@ -59,6 +59,7 @@ class GogoClient:
         last = int([i for i in soup.select("#episode_page")[0]][-2].a['ep_end'])
         soup = BeautifulSoup(self.session.get(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
         all_eps = [eval(ep['href'].strip().split("-episode-")[1].replace("-", ".")) for ep in soup.select("ul#episode_related > li > a")]
+        all_eps.sort()
 
         self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched all episodes for anime id: \"{animeid}\"")
         return all_eps
@@ -77,7 +78,7 @@ class GogoClient:
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/category/{animeid}").content, 'html.parser')
         anime_id = soup.find("input", {"id": "movie_id"})['value']
         soup = BeautifulSoup(self.session.get(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start={min(eps)}&ep_end={max(eps)}&id={anime_id}").content, 'html.parser')
-        links = [f"{self.config.CURRENT_URL}{ep['href'].strip()}" for ep in soup.select("ul#episode_related > li > a") if eval(ep['href'].split('-episode-')[1].replace('-', '.')) in eps]
+        links = [f"{self.config.CURRENT_URL}{ep['href'].strip()}" for ep in soup.select("ul#episode_related > li > a") if eval(ep['href'].split('-episode-')[1].replace('-', '.')) in eps][::-1]
 
         self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched episodes' links for anime id: \"{animeid}\"")
         return links

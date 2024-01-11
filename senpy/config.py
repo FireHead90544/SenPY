@@ -86,6 +86,7 @@ class GogoConfig:
             data={
                 "email": self.email,
                 "password": self.password,
+                # "remember": 1, # TODO: Instead of fetching cookies again and again, just remember them.
                 "_csrf": self.get_csrf_token(),
             },
         )

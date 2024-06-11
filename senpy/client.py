@@ -57,7 +57,7 @@ class GogoClient:
         # Arigato Zai-Kun (https://github.com/FireHead90544/SenPY/issues/10#issue-1955506329)
         anime_id = soup.find("input", {"id": "movie_id"})['value']
         last = int([i for i in soup.select("#episode_page")[0]][-2].a['ep_end'])
-        soup = BeautifulSoup(self.session.get(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
+        soup = BeautifulSoup(self.session.get(f"https://ajax.gogocdn.net/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
         all_eps = [eval(ep['href'].strip().split("-episode-")[1].replace("-", ".")) for ep in soup.select("ul#episode_related > li > a")]
         all_eps.sort()
 

@@ -8,7 +8,7 @@ import time
 
 class GogoConfig:
     """A configuration class for GoGoAnime, 
-    which will be used to login and get the required cookies for downloads,
+    which will be used to log in and get the required cookies for downloads,
     the csrf token and the current gogoanime url, and
     managing the config file.
     """
@@ -26,7 +26,7 @@ class GogoConfig:
         self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
         self.max_concurrent_downloads = int(self.loaded_config['MAX_CONCURRENT_DOWNLOADS'])
         self.session = Session()
-        self.MAIN_URL = "https://anitaku.to" # This hopefully won't ever change.
+        self.MAIN_URL = "https://gogotaku.info/" # This hopefully won't ever change.
         self.CURRENT_URL = ""
         self.get_current_url()
         self.cookies = {}
@@ -102,12 +102,16 @@ class GogoConfig:
 
     def get_current_url(self) -> str:
         """Returns the current gogoanime url with the current domain.
-        Fetches it from the main url, i.e, gogoanime.pe
+        Fetches it from the main url, i.e, https://gogotaku.info/
 
         Returns:
             current_url (str): The URL of the current gogoanime domain.
         """
-        self.CURRENT_URL = self.session.get(self.MAIN_URL).url[:-1]
+        soup = BeautifulSoup(self.session.get(self.MAIN_URL).content, "html.parser")
+        current = soup.find_all('span', {'class' : 'site_go'})
+        lines = [span.get_text() for span in current]
+
+        self.CURRENT_URL = f"https://{lines[0]}"
         return self.CURRENT_URL
 
     def get_csrf_token(self) -> str:

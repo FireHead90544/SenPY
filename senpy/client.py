@@ -1,4 +1,3 @@
-import contextlib
 from .config import GogoConfig
 from .utils import GogoUtils
 from bs4 import BeautifulSoup
@@ -12,6 +11,7 @@ class GogoClient:
     about doing stuffs manually.
     """
     def __init__(self) -> None:
+        self.url_ajax = None
         self.config = GogoConfig()
         self.utils = GogoUtils()
         self.session = self.config.session
@@ -56,8 +56,10 @@ class GogoClient:
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/category/{animeid}").content, 'html.parser')
         # Arigato Zai-Kun (https://github.com/FireHead90544/SenPY/issues/10#issue-1955506329)
         anime_id = soup.find("input", {"id": "movie_id"})['value']
-        last = int([i for i in soup.select("#episode_page")[0]][-2].a['ep_end'])
-        soup = BeautifulSoup(self.session.get(f"https://ajax.gogocdn.net/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
+        last = int(list(soup.select("#episode_page")[0])[-2].a['ep_end'])
+        url = soup.find("meta", property="og:image")
+        self.url_ajax = url["content"].split("/")[2]
+        soup = BeautifulSoup(self.session.get(f"https://ajax.{self.url_ajax}/ajax/load-list-episode?ep_start=0&ep_end={last}&id={anime_id}").content, 'html.parser')
         all_eps = [eval(ep['href'].strip().split("-episode-")[1].replace("-", ".")) for ep in soup.select("ul#episode_related > li > a")]
         all_eps.sort()
 
@@ -77,7 +79,7 @@ class GogoClient:
         start = time.perf_counter()
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/category/{animeid}").content, 'html.parser')
         anime_id = soup.find("input", {"id": "movie_id"})['value']
-        soup = BeautifulSoup(self.session.get(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start={min(eps)}&ep_end={max(eps)}&id={anime_id}").content, 'html.parser')
+        soup = BeautifulSoup(self.session.get(f"https://ajax.{self.url_ajax}/ajax/load-list-episode?ep_start={min(eps)}&ep_end={max(eps)}&id={anime_id}").content, 'html.parser')
         links = [f"{self.config.CURRENT_URL}{ep['href'].strip()}" for ep in soup.select("ul#episode_related > li > a") if eval(ep['href'].split('-episode-')[1].replace('-', '.')) in eps][::-1]
 
         self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched episodes' links for anime id: \"{animeid}\"")

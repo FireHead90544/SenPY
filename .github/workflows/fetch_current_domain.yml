@@ -24,11 +24,22 @@ jobs:
     - name: Write URL to CURRENT_URL.txt
       run: echo "${{ env.current_url }}" > CURRENT_URL.txt
 
-    - name: Commit changes
+    - name: Check for changes
+      id: check_changes
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
         git add CURRENT_URL.txt
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit" >> $GITHUB_ENV
+          echo "changes=false" >> $GITHUB_ENV
+        else
+          echo "changes=true" >> $GITHUB_ENV
+        fi
+
+    - name: Commit changes
+      if: env.changes == 'true'
+      run: |
         git commit -m 'Update CURRENT_URL.txt'
         git push
       env:

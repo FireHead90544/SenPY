@@ -26,7 +26,7 @@ class GogoConfig:
         self.aria_2_path = Path(self.loaded_config['ARIA_2_PATH'])
         self.max_concurrent_downloads = int(self.loaded_config['MAX_CONCURRENT_DOWNLOADS'])
         self.session = Session()
-        self.MAIN_URL = "https://gogotaku.info/" # This hopefully won't ever change.
+        self.MAIN_URL = "https://raw.githubusercontent.com/FireHead90544/SenPY/main/CURRENT_URL.txt"  # GitHub action will auto update this with the current domain
         self.CURRENT_URL = ""
         self.get_current_url()
         self.cookies = {}
@@ -42,7 +42,7 @@ class GogoConfig:
         file_handler = logging.FileHandler(Path.cwd() / "senpy.log", mode="w")
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
-    
+
     def get_config_path(self) -> Path:
         """Returns the path to the config file.
         Local Path ($CWD/config.json) takes greater precedence than Global Path ($HOME/.senpy/config.json)
@@ -102,7 +102,8 @@ class GogoConfig:
 
     def get_current_url(self) -> str:
         """Returns the current gogoanime url with the current domain.
-        Fetches it from the main url, i.e, https://gogotaku.info/
+        Fetches it from the main url that keeps itself updated using a github action, i.e, 
+        https://raw.githubusercontent.com/FireHead90544/SenPY/main/CURRENT_URL.txt
 
         Returns:
             current_url (str): The URL of the current gogoanime domain.

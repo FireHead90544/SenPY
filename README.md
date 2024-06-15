@@ -132,7 +132,6 @@ v`MAJOR`.`MINOR`.`PATCH`
 |  MINOR  |  Includes library updates, major bug updates  |
 |  PATCH  |  Includes minor updates, bug fixes, patches, etc |
 
-`MAJOR` will remain `0` for the time being.
 <hr>
 
 ## A Bit About How It Works

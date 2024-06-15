@@ -14,6 +14,7 @@ import sys
 import re
 
 
+
 init(autoreset=True)
 client = GogoClient()
 
@@ -58,7 +59,6 @@ def home():
     result = prompt(questions=questions, style=client.config.stylesheet)
     result['action']()
 
-
 def update_configs():
     header()
     questions = [
@@ -97,6 +97,7 @@ def update_email() -> None:
     results = prompt(questions=questions, style=client.config.stylesheet)
     client.config.config_updates['EMAIL'] = results['EMAIL']
     update_configs()
+
 
 def update_pass():
     header()
@@ -184,6 +185,7 @@ def write_file():
         client.utils.sleep(3)
     home()
 
+
 def do_pre_checks() -> None:
     """
     Just checks to make sure the dependencies are present in the device
@@ -212,12 +214,13 @@ def do_pre_checks() -> None:
         client.config.logger.critical(f"Downloads directory does not exists, an error occured, Error: {e}")
         sys.exit()
 
+
 def download_using_aria2(links: list, anime_dir: str) -> None:
     """Downloads the episodes using external downloader aria2
     Since the default python downloader (using requests) is tooooo slow as compared to aria2
     and would require me to use my brain tooo much and handle several validations
     because some of you will surely try to break the program.
-    Aria2 is wickedly fast and easy to use, read more about it on it's docs.
+    Aria2 is wickedly fast and easy to use, read more about it on its docs.
     Communicates with aria2 using subprocess PIPE :)
 
     Args:
@@ -225,7 +228,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     """
     start = time.perf_counter()
     download_dir = client.config.downloads_dir / anime_dir
-    cmd = [str(client.config.aria_2_path.resolve()), "-s", '16', "-x", '16', "-j", '16', f"--max-concurrent-downloads={client.config.max_concurrent_downloads}", "-d", str(download_dir.resolve()), "-Z"]
+    cmd = [str(client.config.aria_2_path.resolve()), f"--max-concurrent-downloads={client.config.max_concurrent_downloads}", "-d", str(download_dir.resolve()), "-Z"]
     cmd = subprocess.list2cmdline(cmd)
     cmd += " \"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=True, bufsize=1, universal_newlines=True, stdout=subprocess.PIPE)
@@ -249,9 +252,10 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     client.utils.sleep(10)
     home()
 
+
 def search_anime_and_get_episode_pages_links() -> tuple:
     """
-    Searches for an anime, gets it's id, the number of episodes to download.
+    Searches for an anime, gets its id, the number of episodes to download.
     And, proceeds to download them.
     """
     header()
@@ -324,11 +328,12 @@ def get_results(arg0):
 
 def download_anime() -> None:
     """
-    Searches the anime, selects it and does some highly intellecual stuff
+    Searches the anime, selects it and does some highly intellectual stuff
     and downloads the anime to your machine.
-    In short, searches anime, fetches it's episodes and quality and downloads it.
+    In short, searches anime, fetches its episodes and quality and downloads it.
     """
-    client.config.get_cookies() # get cookies and use login information
+    with contextlib.suppress(Exception):
+        client.config.get_cookies() # get cookies and use login information
     do_pre_checks() # Makes sure everything's okay and program's ready to run.
     ep_pages_links, anime_dir = search_anime_and_get_episode_pages_links()
     header()
@@ -359,7 +364,7 @@ def download_anime() -> None:
                 client.config.logger.warning(f"{result['quality']}p quality not found, selected {quality}p instead for episode: {ep_link}.")
             download_links.append(quality_links[f"{quality}p"])
 
-    download_links = client.utils.fix_episode_download_names(download_links)
+    download_links = client.utils.fix_episode_download_names(ep_list=download_links)
 
     client.config.logger.info("Logging the download links for aria2 experiments or other purposes if required.")
     client.config.logger.info(download_links)

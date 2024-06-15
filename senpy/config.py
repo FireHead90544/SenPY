@@ -108,7 +108,7 @@ class GogoConfig:
         Returns:
             current_url (str): The URL of the current gogoanime domain.
         """
-        self.CURRENT_URL = self.session.get(self.MAIN_URL).text
+        self.CURRENT_URL = self.session.get(self.MAIN_URL).text.split("\n")[0]
         return self.CURRENT_URL
 
     def get_csrf_token(self) -> str:

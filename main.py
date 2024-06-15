@@ -29,7 +29,7 @@ def header() -> None:
     \t\t{Fore.WHITE}/\__/ /{Fore.GREEN}  __/{Fore.RED} | | {Fore.YELLOW}| |     | |  
     \t\t{Fore.WHITE}\____/ {Fore.GREEN}\___|{Fore.RED}_| |_{Fore.YELLOW}\_|     \_/ {Fore.WHITE}v{__version__}  
 
-\t {Fore.GREEN}Developer: {Fore.WHITE}</Rudransh Joshi> {Fore.YELLOW}(FireHead90544)
+\t      {Fore.GREEN}Developers: {Fore.WHITE}FireHead90544 {Fore.RED}& {Fore.YELLOW}Arctic4161
 {Fore.YELLOW} _____________________________________________________________                             
 {Fore.BLUE} _____  ___  _____   {Fore.CYAN}___ _____ _ __  __   ___________ ________ 
 {Fore.BLUE} |__||\ |||\/||___   {Fore.CYAN}|  \|  || | ||\ ||   |  ||__||  \|___|__/ 

@@ -108,11 +108,7 @@ class GogoConfig:
         Returns:
             current_url (str): The URL of the current gogoanime domain.
         """
-        soup = BeautifulSoup(self.session.get(self.MAIN_URL).content, "html.parser")
-        current = soup.find_all('span', {'class' : 'site_go'})
-        lines = [span.get_text() for span in current]
-
-        self.CURRENT_URL = f"https://{lines[0]}"
+        self.CURRENT_URL = self.session.get(self.MAIN_URL).text
         return self.CURRENT_URL
 
     def get_csrf_token(self) -> str:

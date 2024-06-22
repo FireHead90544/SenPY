@@ -42,10 +42,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install gh -y
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.11
 
       - name: Install dependencies
         run: |
@@ -62,7 +62,7 @@ jobs:
         run: |
           TAG_NAME=${{ github.ref_name }}
           echo "Creating release for tag: $TAG_NAME"
-          gh release create $TAG_NAME --generate-notes --title "Release $TAG_NAME" --draft
+          gh release create $TAG_NAME --generate-notes --title "Release $TAG_NAME"
 
       - name: Upload Release Asset
         env:

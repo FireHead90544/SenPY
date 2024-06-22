@@ -15,7 +15,7 @@
 
 ## About SenPY
 
-**SenPY** is a python script that allows you to download animes in your preferred quality. It allows you to download all episodes of an anime as a whole or any specific episode or episode range. It scrapes [gogoanime](https://gogoanime.pe/) and fetches the anime data from there. SenPY uses [aria2](https://github.com/aria2/aria2) as an external downloader which boosts up the download speed drastically and comes with several other epic features. It also allows you to customize your "Anime Downloads" folder and downloads animes to that particular folder only.
+**SenPY** is a python script that allows you to download animes in your preferred quality. It allows you to download all episodes of an anime as a whole or any specific episode or episode range. It scrapes [gogoanime](https://gogoanime.so/) and fetches the anime data from there. SenPY uses [aria2](https://github.com/aria2/aria2) as an external downloader which boosts up the download speed drastically and comes with several other epic features. It also allows you to customize your "Anime Downloads" folder and downloads animes to that particular folder only.
 <hr>
 
 ## Index of Contents
@@ -37,17 +37,17 @@
 ## Installation
 
 The installation is pretty easy.
-1. Head over to the [Releases](https://github.com/FireHead90544/SenPY/releases) section and download the latest release. Now refer to the [setup section](#setup).
-2. Head over to the [aria2's releases](https://github.com/aria2/aria2/releases) and download the latest release for your system. Linux users can run `sudo apt install aria2 -y`
+1. Head over to the [Releases](https://github.com/FireHead90544/SenPY/releases) section and download the latest release for your operating system. Now refer to the [setup section](#setup).
+2. Head over to the [aria2's releases](https://github.com/aria2/aria2/releases) and download the latest release for your system. Linux/Mac users can run `sudo apt install aria2 -y` and `brew install aria2` respectively.
 
-**[Non-Techy users need not to think about this]** If you don't want to download the release and want to build the application on your own (Linux/Mac users needs to this for the time being as well). You need to download python on your system first, clone the repository, switch to the project's root directory, install the requirements present in the `requirements.txt` and run the below command from the project root directory.
+**[Non-Techy users need not to think about this]** If you don't want to download the release and want to build the application on your own (or if you think this is a virus because your dumb antivirus marked it as false positive). You need to download python on your system first, clone the repository, switch to the project's root directory, install the requirements present in the `requirements.txt` and run the below command from the project root directory.
 <details>
   <summary>Read this if you are somewhat experienced with pyinstaller</summary>
-   If you know what you are doing, you can replace <b>--onefile</b> flag with <b>--onedir</b> since it is preferred over <b>--onefile</b> becase <b>--onefile</b> generated applications unpacks everything in a temp directory everytime when run. And linux/mac/android users can replace the "win" in --hidden-import with their os alternative in the below build command as "linux", "macosx", and "android" respectively.
+   If you know what you are doing, you can replace <b>--onefile</b> flag with <b>--onedir</b> since it is preferred over <b>--onefile</b> because of performance reasons as <b>--onefile</b> generated applications unpacks everything in a temp directory everytime when run. And linux/mac/android users can replace the "win" in --hidden-import with their os alternative in the below build command as "linux", "macosx", and "android" respectively.
 </details>
 
 ```console
-pyinstaller --noconfirm --console --onefile --name SenPY --icon icon.ico --hidden-import plyer.platforms.win.notification --add-data "icon.ico;." main.py
+pyinstaller --noconfirm --console --onefile --name SenPY --icon icon.ico --hidden-import plyer.platforms.win.notification --add-data="icon.ico:." main.py
 ```
 Now, open the `dist` folder and get your executable from there.
 <hr>
@@ -56,7 +56,7 @@ Now, open the `dist` folder and get your executable from there.
 
 1. Extract the `aria2`'s folder you just downloaded. Copy the path to it's executable (In windows, the executable has an extension '.exe'), (Linux users can run `which aria2c` and copy that path)
 2. Run the SenPY's application for the first time, it will create a config file at `$HOME/.senpy/config.json` (You can edit it manually if want to or just move onto next step)
-3. Select the `Update Config File` option, update your gogoanime-registered email and password (you can use the below credentials too, but it's better to use your own since these ones can be invalidated probably). In the `aria2's executable path input`, enter the path to aria2's executable you just copied and in the `downloads folder input`, enter the path to the folder (make sure to create one already) where you want your animes to be downloaded.
+3. Select the `Update Config File` option, update your gogoanime-registered email and password (you can use the below credentials too, but it's better to use your own since these ones can be invalidated probably). In the `aria2's executable path input`, enter the path to aria2's executable you just copied and in the `downloads folder input`, enter the path to the folder (make sure to create one already) where you want your animes to be downloaded. You can also set the maximum concurrent downloads and some other stuffs.
 
 **Config File Location** (Not meant for general public): `$HOME/.senpy/config.json` (Global Location), `Project Root/config.json` (Local Location). Local Location takes priority over Global Location.
 

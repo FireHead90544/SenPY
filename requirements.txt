@@ -1,6 +1,6 @@
-InquirerPy
-pyinstaller
-colorama
-requests
-plyer
-bs4
+InquirerPy~=0.3.4
+colorama~=0.4.6
+requests~=2.32.3
+plyer~=2.1.0
+bs4~=0.0.2
+beautifulsoup4~=4.12.3

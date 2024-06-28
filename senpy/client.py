@@ -97,7 +97,8 @@ class GogoClient:
         start = time.perf_counter()
         soup = BeautifulSoup(self.session.get(url).content, 'html.parser')
         links = {}
-        qualities_container = soup.select("#wrapper_bg > section > section.content_left > div > div.anime_video_body > div.list_dowload > div > a")
+        qualities_container = soup.select("#wrapper_bg > section > section.content_left > div > div.anime_video_body "
+                                          "> div.list_dowload > div > a")
         if not qualities_container:
             self.config.logger.error(f"Unable to retrieve links for the url \"{url}\"")
             return links
@@ -107,8 +108,10 @@ class GogoClient:
                 redirected = self.session.get(link["href"], allow_redirects=False)
                 links[f"{link.getText().strip().split('x')[1]}p"] = redirected.headers['location'].strip()
             except KeyError as e:
-                self.config.logger.error(f"Unable to retrieve link for {link.getText().strip().split('x')[1]}p quality for this episode")
+                self.config.logger.error(f"Unable to retrieve link for {link.getText().strip().split('x')[1]}p "
+                                         f"quality for this episode")
         links = {k: v for k, v in links.items() if v} # Filter out empty links
 
-        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched links for qualities available for episode #{url.split('-')[-1].replace('/', '')}")
+        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched links for qualities available "
+                                f"for episode #{url.split('-')[-1].replace('/', '')}")
         return links

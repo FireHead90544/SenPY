@@ -1,10 +1,63 @@
+import json
 import os
+import re
 import time
+import requests
+
 
 class GogoUtils:
     """Some utilities used by the application."""
     def __init__(self) -> None:
         pass
+
+    def parse_mal_json(self, mal_username, batch_mal_dub, batch_mal_status):
+        anime_dic = {}
+        search_url = f"https://myanimelist.net/animelist/{mal_username}/load.json?status={batch_mal_status}"
+        response = requests.get(search_url)
+        json_data = json.loads(response.text)
+        for sort in json_data:
+            for key, value in sort.items():
+                if key == 'anime_title':
+                    if value != "":
+                        value = re.sub('[^A-Za-z0-9]+', ' ', value)
+                        if "Movie" in value:
+                            match = re.search(r'\b{}\b'.format("Movie"), value)
+                            if match:
+                                index = match.start() + 6
+                                try:
+                                    if value[index].isdigit():
+                                        value = value.replace(f"Movie {value[index]}", '')
+                                except IndexError:
+                                    pass
+                        if batch_mal_dub == 'Dub':
+                            anime_dic[f'{value} Dub'] = None
+                            second_key = f'{value} Dub'
+                        else:
+                            anime_dic[value] = value
+                            second_key = value
+                if key == 'anime_title_eng':
+                    value = re.sub('[^A-Za-z0-9]+', ' ', value)
+                    if value != "":
+                        if "Movie" in value:
+                            match = re.search(r'\b{}\b'.format("Movie"), value)
+                            if match:
+                                index = match.start() + 6
+                                try:
+                                    if value[index].isdigit():
+                                        value = value.replace(f"Movie {value[index]}", '')
+                                except IndexError:
+                                    pass
+                        if batch_mal_dub == 'Dub':
+                            if second_key in anime_dic:
+                                anime_dic[second_key] = f'{value} Dub'
+                            else:
+                                anime_dic[f'{value} Dub'] = None
+                        else:
+                            if second_key in anime_dic:
+                                anime_dic[second_key] = value
+                            else:
+                                anime_dic[value] = None
+        return anime_dic
 
     def string_to_sequence(self, ep_str: str) -> list:
         """Parses and returns a sequence of episodes from a string containing episode numbers.
@@ -45,7 +98,6 @@ class GogoUtils:
             prefix, name = link.split("&title=")
             name = f"EP.{name.split('-episode-')[1].replace('-', '.')}"
             named_downloads.append(f"{prefix}&title={name}")
-        
         return named_downloads
 
     def clear(self) -> None:

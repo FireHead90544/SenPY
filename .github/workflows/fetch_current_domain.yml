@@ -39,7 +39,7 @@ jobs:
     - name: Commit changes
       if: env.changes == 'true'
       run: |
-        git commit -m 'Update CURRENT_URL.txt'
+        git commit -m 'chore: update gogoanime url'
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

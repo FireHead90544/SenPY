@@ -1,4 +1,3 @@
-import requests
 from colorama import Fore
 from requests import Session
 from bs4 import BeautifulSoup
@@ -85,7 +84,7 @@ class GogoConfig:
                                "DOWNLOADS_DIR": r"ENTER DOWNLOAD LOCATION (Windows: Drive:\Folder, Linux: "
                                                 "/path/to/folder)",
                                "ARIA_2_PATH": "ENTER THE PATH TO ARIA2's EXECUTABLE",
-                               "BATCH_DOWNLOAD_MAL": "True",
+                               "BATCH_DOWNLOAD_MAL": True,
                                "STATUS": "Plan to Watch",
                                "DUB": "Dub",
                                "QUALITY": 1080,

@@ -7,6 +7,7 @@ import requests
 
 class GogoUtils:
     """Some utilities used by the application."""
+
     def __init__(self) -> None:
         pass
 
@@ -17,24 +18,23 @@ class GogoUtils:
         json_data = json.loads(response.text)
         for sort in json_data:
             for key, value in sort.items():
-                if key == 'anime_title':
-                    if value != "":
-                        value = re.sub('[^A-Za-z0-9]+', ' ', value)
-                        if "Movie" in value:
-                            match = re.search(r'\b{}\b'.format("Movie"), value)
-                            if match:
-                                index = match.start() + 6
-                                try:
-                                    if value[index].isdigit():
-                                        value = value.replace(f"Movie {value[index]}", '')
-                                except IndexError:
-                                    pass
-                        if batch_mal_dub == 'Dub':
-                            anime_dic[f'{value} Dub'] = None
-                            second_key = f'{value} Dub'
-                        else:
-                            anime_dic[value] = value
-                            second_key = value
+                if key == 'anime_title' and value != "":
+                    value = re.sub('[^A-Za-z0-9]+', ' ', value)
+                    if "Movie" in value:
+                        match = re.search(r'\b{}\b'.format("Movie"), value)
+                        if match:
+                            index = match.start() + 6
+                            try:
+                                if value[index].isdigit():
+                                    value = value.replace(f"Movie {value[index]}", '')
+                            except IndexError:
+                                pass
+                    if batch_mal_dub == 'Dub':
+                        anime_dic[f'{value} Dub'] = None
+                        second_key = f'{value} Dub'
+                    else:
+                        anime_dic[value] = value
+                        second_key = value
                 if key == 'anime_title_eng':
                     value = re.sub('[^A-Za-z0-9]+', ' ', value)
                     if value != "":
@@ -71,10 +71,10 @@ class GogoUtils:
         final = []
         temp = list(ep_str.split(","))
         for i in temp:
-            if "-" in i: # Handles episode in between ranges (list(int))
+            if "-" in i:  # Handles episode in between ranges (list(int))
                 lower, upper = list(i.split("-"))
-                final.extend(range(int(lower), int(upper)+1))
-            else: # Handles, extra/bonus episodes (floats) and normal episodes (ints)
+                final.extend(range(int(lower), int(upper) + 1))
+            else:  # Handles, extra/bonus episodes (floats) and normal episodes (ints)
                 try:
                     final.append(int(i))
                 except ValueError:
@@ -128,20 +128,20 @@ class GogoUtils:
         seconds = rawseconds - days * 86400 - hours * 3600 - minutes * 60
 
         return (
-            ("{0} day{1}, ".format(days, "s" if days != 1 else "") if days else "")
-            + (
-                "{0} hour{1}, ".format(hours, "s" if hours != 1 else "")
-                if hours
-                else ""
-            )
-            + (
-                "{0} minute{1}, ".format(minutes, "s" if minutes != 1 else "")
-                if minutes
-                else ""
-            )
-            + (
-                "{0} second{1}, ".format(seconds, "s" if seconds != 1 else "")
-                if seconds
-                else ""
-            )[:-2]
+                ("{0} day{1}, ".format(days, "s" if days != 1 else "") if days else "")
+                + (
+                    "{0} hour{1}, ".format(hours, "s" if hours != 1 else "")
+                    if hours
+                    else ""
+                )
+                + (
+                    "{0} minute{1}, ".format(minutes, "s" if minutes != 1 else "")
+                    if minutes
+                    else ""
+                )
+                + (
+                      "{0} second{1}, ".format(seconds, "s" if seconds != 1 else "")
+                      if seconds
+                      else ""
+                  )[:-2]
         )

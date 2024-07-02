@@ -1,3 +1,7 @@
+import re
+
+import requests
+
 from .config import GogoConfig
 from .utils import GogoUtils
 from bs4 import BeautifulSoup
@@ -79,10 +83,13 @@ class GogoClient:
         start = time.perf_counter()
         soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/category/{animeid}").content, 'html.parser')
         anime_id = soup.find("input", {"id": "movie_id"})['value']
-        soup = BeautifulSoup(self.session.get(f"https://ajax.{self.url_ajax}/ajax/load-list-episode?ep_start={min(eps)}&ep_end={max(eps)}&id={anime_id}").content, 'html.parser')
-        links = [f"{self.config.CURRENT_URL}{ep['href'].strip()}" for ep in soup.select("ul#episode_related > li > a") if eval(ep['href'].split('-episode-')[1].replace('-', '.')) in eps][::-1]
+        soup = BeautifulSoup(self.session.get(f"https://ajax.{self.url_ajax}/ajax/load-list-episode?ep_start={min(eps)}"
+                                              f"&ep_end={max(eps)}&id={anime_id}").content, 'html.parser')
+        links = [f"{self.config.CURRENT_URL}{ep['href'].strip()}" for ep in soup.select("ul#episode_related > li > a")
+                 if eval(ep['href'].split('-episode-')[1].replace('-', '.')) in eps][::-1]
 
-        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched episodes' links for anime id: \"{animeid}\"")
+        self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched episodes' links for anime id: "
+                                f"\"{animeid}\"")
         return links
 
     def get_episode_quality_download_links(self, url: str) -> dict:
@@ -115,3 +122,25 @@ class GogoClient:
         self.config.logger.info(f"({round(time.perf_counter() - start, 2)}s) Fetched links for qualities available "
                                 f"for episode #{url.split('-')[-1].replace('/', '')}")
         return links
+
+    def get_show_from_bookmark(self):
+        anime_dic = {}
+        soup = BeautifulSoup(self.session.get(f"{self.config.CURRENT_URL}/user/bookmark").content, 'html.parser')
+        table = soup.find("div", attrs={"class": "article_bookmark"})
+        splitTableLines = table.text.split("Remove")
+        for rows in splitTableLines:
+            fullRow = " ".join(rows.split())
+            if "Anime name" in fullRow:
+                fullRow = fullRow.replace("Anime name Latest", "")
+                splitRow = fullRow.split("Latest")
+            elif fullRow == "Status":
+                break
+            else:
+                fullRow = fullRow.replace("Status ", "")
+                splitRow = fullRow.split("Latest")
+            animeName = splitRow[0].strip().encode("ascii", "ignore").decode()
+            animeName = re.sub("[^A-Za-z\d ]+", "", animeName)
+            anime_dic[animeName] = None
+
+        return anime_dic
+

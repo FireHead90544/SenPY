@@ -625,7 +625,6 @@ def batch_download_anime() -> None:
     and downloads the anime to your machine.
     In short, searches anime, fetches its episodes and quality and downloads it.
     """
-    anime_dic = {}
     if "auth" not in client.config.cookies:
         client.config.get_cookies()  # get cookies and use login information
     do_pre_checks()  # Makes sure everything's okay and program's ready to run.
@@ -633,6 +632,10 @@ def batch_download_anime() -> None:
         print(f"\n>>> {Fore.GREEN}Fetching anime list from MAL...")
         anime_dic = client.utils.parse_mal_json(client.config.batch_mal_username, client.config.batch_mal_dub,
                                                 client.config.batch_mal_status)
+    else:
+        print(f"\n>>> {Fore.GREEN}Fetching shows from bookmarks...")
+        anime_dic = client.get_show_from_bookmark()
+
     for key, value in anime_dic.items():
         anime_id = batch_results(key, value)
         if anime_id is not None:

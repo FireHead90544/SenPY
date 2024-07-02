@@ -357,8 +357,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     cmd += " \"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=False, bufsize=1, universal_newlines=True, stdout=subprocess.PIPE)
     for line in p.stdout:
-        if "error" or "errorCode" or "Download aborted." not in line:
-            print(line.rstrip(), end="\r")
+        print(line.rstrip(), end="\r")
     p.communicate()
     with open(file, "r+") as file:
         lines = file.readlines()
@@ -519,38 +518,7 @@ def download_anime() -> None:
         f"available quality will be chosen.")
     result = prompt(questions=questions, style=client.config.stylesheet)
     print(f"\n>>> {Fore.GREEN}Fetching Download Links...")
-    download_links = []
-    for ep_link in ep_pages_links:
-        quality_links = client.get_episode_quality_download_links(ep_link)
-        qualities = [int(q.replace("p", "")) for q in
-                     quality_links.keys()]  # Get the raw integers of the qualities available for easy comparision
-        if f"{result['quality']}p" in quality_links.keys():
-            download_links.append(quality_links[f"{result['quality']}p"])
-        else:
-            try:
-                quality = sorted([q for q in qualities if q > result['quality']])[0]  # Get the next quality available
-                client.config.logger.warning(
-                    f"{result['quality']}p quality not found, selected {quality}p instead for episode: {ep_link}.")
-            except Exception:
-                quality = sorted([q for q in qualities if q < result['quality']])[
-                    -1]  # Get the previous quality available
-                client.config.logger.warning(
-                    f"{result['quality']}p quality not found, selected {quality}p instead for episode: {ep_link}.")
-            download_links.append(quality_links[f"{quality}p"])
-
-    download_links = client.utils.fix_episode_download_names(ep_list=download_links)
-    client.config.logger.info("Logging the download links for aria2 experiments or other purposes if required.")
-    client.config.logger.info(download_links)
-    print(
-        f"\n>>> {Fore.GREEN}Fetched Download Links. Starting Download in a few seconds. "
-        f"Please do not close the window.")
-    print(
-        f"\n>>> {Fore.RED}If you are an experienced aria2 user, download links have also been logged in the log file, "
-        f"you can do stuffs with them later.")
-    print(f"\n>>> {Fore.GREEN}You can change the number of max concurrent downloads in config file.")
-    client.utils.sleep(6)
-    header()
-    download_using_aria2(download_links, anime_dir)  # The actual downloading here
+    fetch_downloads(ep_pages_links, result['quality'], anime_dir)
     home()
 
 
@@ -604,6 +572,53 @@ def batch_results(key, value):
     client.config.logger.info(f"No results found for {key}")
 
 
+def fetch_downloads(ep_pages_links, value, anime_dir):
+    try:
+        download_links = []
+        for ep_link in ep_pages_links:
+            quality_links = client.get_episode_quality_download_links(ep_link)
+            qualities = [int(q.replace("p", "")) for q in
+                         quality_links.keys()]  # Get the raw integers of the qualities available for easy comparision
+            if f"{client.config.batch_quality}p" in quality_links:
+                download_links.append(quality_links[f"{client.config.batch_quality}p"])
+            elif f"{client.config.batch_quality}p" not in quality_links.keys():
+                try:
+                    quality = sorted([q for q in qualities if q > client.config.batch_quality])[
+                        0]  # Get the next quality available
+                    client.config.logger.warning(
+                        f"{client.config.batch_quality}p quality not found, "
+                        f"selected {quality}p instead for episode: {ep_link}.")
+                except Exception:
+                    quality = sorted([q for q in qualities if q < client.config.batch_quality])[
+                        -1]  # Get the previous quality available
+                    client.config.logger.warning(
+                        f"{client.config.batch_quality}p quality not found, selected "
+                        f"{quality}p instead for episode: {ep_link}.")
+                download_links.append(quality_links[f"{quality}p"])
+        download_links = client.utils.fix_episode_download_names(ep_list=download_links)
+        client.config.logger.info(
+            "Logging the download links for aria2 experiments or other purposes if required.")
+        client.config.logger.info(download_links)
+        print(
+            f"\n>>> {Fore.GREEN}"
+            f"Fetched Download Links. Starting Download in a few seconds. Please do not close the "
+            f"window.")
+        print(
+            f"\n>>> {Fore.RED}"
+            f"If you are an experienced aria2 user, download links have also been logged in the log "
+            f"file, "
+            f"you can do stuffs with them later.")
+        print(f"\n>>> {Fore.GREEN}You can change the number of max concurrent downloads in config file.")
+        client.utils.sleep(6)
+        download_using_aria2(download_links, anime_dir)
+        return
+
+    except IndexError:
+        print(f"\n>>> {Fore.RED}No results found for {value}")
+        client.config.logger.info(f"No results found for {value}")
+        return
+
+
 def batch_download_anime() -> None:
     """
     Searches for the anime, selects it and does some highly intellectual stuff
@@ -621,52 +636,11 @@ def batch_download_anime() -> None:
     for key, value in anime_dic.items():
         anime_id = batch_results(key, value)
         if anime_id is not None:
-            try:
-                all_eps = client.get_all_episode_numbers(anime_id)
-                anime_dir = anime_id.replace("-", " ").title()
-                print(f"\n>>> {Fore.GREEN}Fetching Download Links for {anime_dir}")
-                ep_pages_links = client.get_episode_pages_links(anime_id, all_eps)
-                download_links = []
-                for ep_link in ep_pages_links:
-                    quality_links = client.get_episode_quality_download_links(ep_link)
-                    qualities = [int(q.replace("p", "")) for q in
-                                 quality_links.keys()]
-                    # Get the raw integers of the qualities available for easy comparision
-                    if f"{client.config.batch_quality}p" in quality_links:
-                        download_links.append(quality_links[f"{client.config.batch_quality}p"])
-                    elif f"{client.config.batch_quality}p" not in quality_links.keys():
-                        try:
-                            quality = sorted([q for q in qualities if q > client.config.batch_quality])[
-                                0]  # Get the next quality available
-                            client.config.logger.warning(
-                                f"{client.config.batch_quality}p quality not found, "
-                                f"selected {quality}p instead for episode: {ep_link}.")
-                        except Exception:
-                            quality = sorted([q for q in qualities if q < client.config.batch_quality])[
-                                -1]  # Get the previous quality available
-                            client.config.logger.warning(
-                                f"{client.config.batch_quality}p quality not found, selected "
-                                f"{quality}p instead for episode: {ep_link}.")
-                        download_links.append(quality_links[f"{quality}p"])
-                download_links = client.utils.fix_episode_download_names(ep_list=download_links)
-                client.config.logger.info(
-                    "Logging the download links for aria2 experiments or other purposes if required.")
-                client.config.logger.info(download_links)
-                print(
-                    f"\n>>> {Fore.GREEN}"
-                    f"Fetched Download Links. Starting Download in a few seconds. Please do not close the "
-                    f"window.")
-                print(
-                    f"\n>>> {Fore.RED}"
-                    f"If you are an experienced aria2 user, download links have also been logged in the log "
-                    f"file, "
-                    f"you can do stuffs with them later.")
-                print(f"\n>>> {Fore.GREEN}You can change the number of max concurrent downloads in config file.")
-                client.utils.sleep(6)
-                download_using_aria2(download_links, anime_dir)
-            except IndexError:
-                print(f"\n>>> {Fore.RED}No results found for {value}")
-                client.config.logger.info(f"No results found for {value}")
+            all_eps = client.get_all_episode_numbers(anime_id)
+            anime_dir = anime_id.replace("-", " ").title()
+            print(f"\n>>> {Fore.GREEN}Fetching Download Links for {anime_dir}")
+            ep_pages_links = client.get_episode_pages_links(anime_id, all_eps)
+            fetch_downloads(ep_pages_links, value, anime_dir)
     home()
 
 

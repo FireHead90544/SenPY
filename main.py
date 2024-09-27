@@ -352,7 +352,7 @@ def download_using_aria2(links: list, anime_dir: str) -> None:
     file = f"{str(client.config.aria_2_path.resolve())[:-10]}Failed_Download.log"
     cmd = [str(client.config.aria_2_path.resolve()),
            f"--max-concurrent-downloads={client.config.max_concurrent_downloads}", "-d", str(download_dir.resolve()),
-           "-Z", "--save-session", file, "--auto-file-renaming=false"]
+           "-Z", "--save-session", file, "--auto-file-renaming=false", "--disable-ipv6"]
     cmd = subprocess.list2cmdline(cmd)
     cmd += " \"" + "\" \"".join(links) + "\""
     p = subprocess.Popen(cmd, shell=False, bufsize=1, universal_newlines=True, stdout=subprocess.PIPE)
